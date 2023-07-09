@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/customers")
 public class CustomerController {
@@ -89,16 +89,10 @@ public class CustomerController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Customer cus1 = customerdao.findByNic(customer.getNic());
+        Customer cus = customerdao.findByNic(customer.getNic());
 
-        //System.out.println("ID-"+customer.getId()+"-"+customer.getNic());
-        //if(emp1!=null) System.out.println("NIC-"+emp1.getNic());
-
-        if(cus1!=null && customer.getId()!=cus1.getId())
+        if(cus!=null && customer.getId()!=cus.getId())
             errors = errors+"<br> Existing NIC";
-
-        //System.out.println(customer.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") customerdao.save(customer);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -116,10 +110,10 @@ public class CustomerController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Customer emp1 = customerdao.findAllById(id);
-        if(emp1==null)
+        Customer cus = customerdao.findAllById(id);
+        if(cus==null)
             errors = errors+"<br> customer Does Not Existed";
-        if(errors=="") customerdao.delete(emp1);
+        if(errors=="") customerdao.delete(cus);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/customers/"+id);

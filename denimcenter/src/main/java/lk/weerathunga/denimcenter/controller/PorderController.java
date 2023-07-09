@@ -87,16 +87,10 @@ public class PorderController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Porder emp1 = porderdao.findByNumber(porder.getNumber());
+        Porder pod = porderdao.findByNumber(porder.getNumber());
 
-        //System.out.println("ID-"+porder.getId()+"-"+porder.getNumber());
-        //if(emp1!=null) System.out.println("NUMBER-"+emp1.getNumber());
-
-        if(emp1!=null && porder.getId()!=emp1.getId())
+        if(pod!=null && porder.getId()!=pod.getId())
             errors = errors+"<br> Existing NUMBER";
-
-        //System.out.println(porder.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") porderdao.save(porder);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -114,10 +108,10 @@ public class PorderController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Porder emp1 = porderdao.findAllById(id);
-        if(emp1==null)
+        Porder pod = porderdao.findAllById(id);
+        if(pod==null)
             errors = errors+"<br> porder Does Not Existed";
-        if(errors=="") porderdao.delete(emp1);
+        if(errors=="") porderdao.delete(pod);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/porders/"+id);

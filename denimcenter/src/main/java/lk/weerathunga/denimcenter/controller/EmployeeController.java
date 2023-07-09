@@ -73,16 +73,10 @@ public class EmployeeController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Employee emp1 = employeedao.findByNic(employee.getNic());
+        Employee emp = employeedao.findByNic(employee.getNic());
 
-        //System.out.println("ID-"+employee.getId()+"-"+employee.getNic());
-        //if(emp1!=null) System.out.println("NIC-"+emp1.getNic());
-
-        if(emp1!=null && employee.getId()!=emp1.getId())
+        if(emp!=null && employee.getId()!=emp.getId())
             errors = errors+"<br> Existing NIC";
-
-        //System.out.println(employee.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") employeedao.save(employee);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -100,10 +94,10 @@ public class EmployeeController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Employee emp1 = employeedao.findAllById(id);
-        if(emp1==null)
+        Employee emp = employeedao.findAllById(id);
+        if(emp==null)
             errors = errors+"<br> employee Does Not Existed";
-        if(errors=="") employeedao.delete(emp1);
+        if(errors=="") employeedao.delete(emp);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/employees/"+id);

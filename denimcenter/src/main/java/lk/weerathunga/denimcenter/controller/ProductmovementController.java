@@ -48,9 +48,6 @@ public class ProductmovementController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(productmovementdao.findByCode(productmovement.getCode())!=null)
-            errors = errors+"<br> Existing Code";*/
-
         if(errors=="")
             productmovementdao.save(productmovement);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -69,17 +66,6 @@ public class ProductmovementController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        //Productmovement prod1 = productmovementdao.findByCode(productmovement.getCode());
-
-        //System.out.println("ID-"+productmovement.getId()+"-"+productmovement.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        /*if(prod1!=null && productmovement.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";*/
-
-        //System.out.println(productmovement.getFirstname());
-        //System.out.println("Err-"+errors);
-
         if(errors=="") productmovementdao.save(productmovement);
         else errors = "Server Validation Errors : <br> "+errors;
 
@@ -96,10 +82,10 @@ public class ProductmovementController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Productmovement emp1 = productmovementdao.findAllById(id);
-        if(emp1==null)
+        Productmovement mov = productmovementdao.findAllById(id);
+        if(mov==null)
             errors = errors+"<br> productmovement Does Not Existed";
-        if(errors=="") productmovementdao.delete(emp1);
+        if(errors=="") productmovementdao.delete(mov);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/productmovements/"+id);

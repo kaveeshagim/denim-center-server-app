@@ -44,9 +44,6 @@ public class BillofmaterialController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(billofmaterialdao.findByCode(billofmaterial.getCode())!=null)
-            errors = errors+"<br> Existing Code";*/
-
         if(errors=="")
             billofmaterialdao.save(billofmaterial);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -65,17 +62,6 @@ public class BillofmaterialController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*Billofmaterial prod1 = billofmaterialdao.findByCode(billofmaterial.getCode());
-
-        //System.out.println("ID-"+billofmaterial.getId()+"-"+billofmaterial.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        if(prod1!=null && billofmaterial.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";*/
-
-        //System.out.println(billofmaterial.getFirstname());
-        //System.out.println("Err-"+errors);
-
         if(errors=="") billofmaterialdao.save(billofmaterial);
         else errors = "Server Validation Errors : <br> "+errors;
 
@@ -92,10 +78,10 @@ public class BillofmaterialController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Billofmaterial emp1 = billofmaterialdao.findAllById(id);
-        if(emp1==null)
+        Billofmaterial bom = billofmaterialdao.findAllById(id);
+        if(bom==null)
             errors = errors+"<br> billofmaterial Does Not Existed";
-        if(errors=="") billofmaterialdao.delete(emp1);
+        if(errors=="") billofmaterialdao.delete(bom);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/billofmaterials/"+id);

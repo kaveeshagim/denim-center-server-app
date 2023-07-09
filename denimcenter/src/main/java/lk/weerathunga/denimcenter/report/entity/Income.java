@@ -1,5 +1,7 @@
 package lk.weerathunga.denimcenter.report.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -9,6 +11,7 @@ import java.util.Date;
 public class Income {
 
     private Integer id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     private BigDecimal amount;
 

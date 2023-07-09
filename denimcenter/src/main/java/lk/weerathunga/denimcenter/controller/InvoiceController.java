@@ -88,16 +88,10 @@ public class InvoiceController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Invoice prod1 = invoicedao.findByNumber(invoice.getNumber());
+        Invoice inv = invoicedao.findByNumber(invoice.getNumber());
 
-        //System.out.println("ID-"+invoice.getId()+"-"+invoice.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        if(prod1!=null && invoice.getId()!=prod1.getId())
+        if(inv!=null && invoice.getId()!=inv.getId())
             errors = errors+"<br> Existing Number";
-
-        //System.out.println(invoice.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") invoicedao.save(invoice);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -115,10 +109,10 @@ public class InvoiceController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Invoice emp1 = invoicedao.findAllById(id);
-        if(emp1==null)
+        Invoice inv = invoicedao.findAllById(id);
+        if(inv==null)
             errors = errors+"<br> invoice Does Not Existed";
-        if(errors=="") invoicedao.delete(emp1);
+        if(errors=="") invoicedao.delete(inv);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/invoices/"+id);

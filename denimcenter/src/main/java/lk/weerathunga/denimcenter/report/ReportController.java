@@ -1,14 +1,8 @@
 package lk.weerathunga.denimcenter.report;
 
 import lk.weerathunga.denimcenter.entity.Productionstatus;
-import lk.weerathunga.denimcenter.report.dao.CountByCorderstatusDao;
-import lk.weerathunga.denimcenter.report.dao.CountByPorderstatusDao;
-import lk.weerathunga.denimcenter.report.dao.CountByProductionstatusDao;
-import lk.weerathunga.denimcenter.report.dao.ExpenseDao;
-import lk.weerathunga.denimcenter.report.entity.CountByCorderstatus;
-import lk.weerathunga.denimcenter.report.entity.CountByPorderstatus;
-import lk.weerathunga.denimcenter.report.entity.CountByProductionstatus;
-import lk.weerathunga.denimcenter.report.entity.Expense;
+import lk.weerathunga.denimcenter.report.dao.*;
+import lk.weerathunga.denimcenter.report.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +29,8 @@ public class ReportController {
     private CountByPorderstatusDao countByPorderstatusdao;
     @Autowired
     private ExpenseDao expensedao;
-
+    @Autowired
+    private IncomeDao incomedao;
     @GetMapping(path = "/countbyproductionstatus", produces = "application/json")
     public List<CountByProductionstatus> getCountByProductionstatus() {
 
@@ -101,6 +96,29 @@ public class ReportController {
         return this.expensedao.expense();
     }
 
+    @GetMapping(path = "/income", produces = "application/json")
+    public Map<Date, BigDecimal> getIncome() {
+        List<Income> incomes = this.incomedao.income();
+        List<Expense> expenses = this.expensedao.expense();
+
+        Map<Date, BigDecimal> incomeMap = new HashMap<>();
+
+        for (Income income : incomes) {
+            Date date = income.getDate();
+            BigDecimal amount = income.getAmount();
+            incomeMap.put(date, amount);
+        }
+
+        for (Expense expense : expenses) {
+            Date date = expense.getDate();
+            BigDecimal amount = expense.getAmount();
+            incomeMap.merge(date, amount, BigDecimal::subtract);
+        }
+
+        return incomeMap;
+    }
+
+
     @GetMapping(path = "/dailyexpenses", produces = "application/json")
     public List<Expense> getDailyExpenses() {
         List<Expense> expenses = this.expensedao.expense();
@@ -128,7 +146,46 @@ public class ReportController {
         return dailyExpenses;
     }
 
-    /*@GetMapping(path = "/weeklyexpenses", produces = "application/json")
+    @GetMapping(path = "/dailyincome", produces = "application/json")
+    public List<Income> getDailyIncome() {
+        List<Income> incomes = this.incomedao.income();
+        List<Expense> expenses = this.expensedao.expense();
+
+        Map<Date, BigDecimal> dailyIncomeMap = new HashMap<>();
+
+        // Calculate daily income by summing up individual incomes
+        for (Income income : incomes) {
+            Date date = income.getDate();
+            BigDecimal amount = income.getAmount();
+
+            BigDecimal currentAmount = dailyIncomeMap.getOrDefault(date, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.add(amount);
+            dailyIncomeMap.put(date, updatedAmount);
+        }
+
+        // Subtract daily expenses from daily income
+        for (Expense expense : expenses) {
+            Date date = expense.getDate();
+            BigDecimal amount = expense.getAmount();
+
+            BigDecimal currentAmount = dailyIncomeMap.getOrDefault(date, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.subtract(amount);
+            dailyIncomeMap.put(date, updatedAmount);
+        }
+
+        // Convert the daily income map into a list of Income objects
+        List<Income> dailyIncome = new ArrayList<>();
+        for (Map.Entry<Date, BigDecimal> entry : dailyIncomeMap.entrySet()) {
+            Date date = entry.getKey();
+            BigDecimal amount = entry.getValue();
+            Income dailyIncomeEntry = new Income(date, amount);
+            dailyIncome.add(dailyIncomeEntry);
+        }
+
+        return dailyIncome;
+    }
+
+    @GetMapping(path = "/weeklyexpenses", produces = "application/json")
     public List<Expense> getWeeklyExpenses() {
         List<Expense> expenses = this.expensedao.expense();
         Map<Date, BigDecimal> weeklyExpensesMap = new HashMap<>();
@@ -138,85 +195,85 @@ public class ReportController {
             Date expenseDate = expense.getDate();
             BigDecimal amount = expense.getAmount();
 
-            Date weekStartDate = getWeekStartDate(expenseDate);
-            BigDecimal currentAmount = weeklyExpensesMap.getOrDefault(weekStartDate, BigDecimal.ZERO);
+            Date week = getWeek(expenseDate);
+            BigDecimal currentAmount = weeklyExpensesMap.getOrDefault(week, BigDecimal.ZERO);
             BigDecimal updatedAmount = currentAmount.add(amount);
-            weeklyExpensesMap.put(weekStartDate, updatedAmount);
+            weeklyExpensesMap.put(week, updatedAmount);
         }
 
-        // Convert the weekly expenses map into a list of WeeklyExpense objects
+        // Convert the weekly expenses map into a list of Expense objects
         List<Expense> weeklyExpenses = new ArrayList<>();
         for (Map.Entry<Date, BigDecimal> entry : weeklyExpensesMap.entrySet()) {
-            Date weekStartDate = entry.getKey();
+            Date week = entry.getKey();
             BigDecimal amount = entry.getValue();
-            Expense weeklyExpense = new Expense(weekStartDate, amount);
+            Expense weeklyExpense = new Expense(week, amount);
             weeklyExpenses.add(weeklyExpense);
         }
 
         return weeklyExpenses;
     }
 
-    private Date getWeekStartDate(Date date) {
+    private Date getWeek(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
-    }*/
 
-    @GetMapping(path = "/weeklyexpenses", produces = "application/json")
-    public Map<String, BigDecimal> getWeeklyExpenses() {
+        int year = calendar.get(Calendar.YEAR);
+        int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+
+        // Create a new Calendar instance and set it to the start of the week
+        Calendar startOfWeek = Calendar.getInstance();
+        startOfWeek.clear();
+        startOfWeek.set(Calendar.YEAR, year);
+        startOfWeek.set(Calendar.WEEK_OF_YEAR, weekOfYear);
+        startOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        startOfWeek.set(Calendar.HOUR_OF_DAY, 0);
+        startOfWeek.set(Calendar.MINUTE, 0);
+        startOfWeek.set(Calendar.SECOND, 0);
+        startOfWeek.set(Calendar.MILLISECOND, 0);
+
+        return startOfWeek.getTime();
+    }
+
+    @GetMapping(path = "/weeklyincome", produces = "application/json")
+    public List<Income> getWeeklyIncome() {
+        List<Income> incomes = this.incomedao.income();
         List<Expense> expenses = this.expensedao.expense();
-        Map<Date, BigDecimal> weeklyExpensesMap = new HashMap<>();
 
-        // Calculate weekly expenses by summing up individual expenses
+        Map<Date, BigDecimal> weeklyIncomeMap = new HashMap<>();
+
+        // Calculate weekly income by summing up individual incomes
+        for (Income income : incomes) {
+            Date incomeDate = income.getDate();
+            BigDecimal amount = income.getAmount();
+
+            Date week = getWeek(incomeDate);
+            BigDecimal currentAmount = weeklyIncomeMap.getOrDefault(week, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.add(amount);
+            weeklyIncomeMap.put(week, updatedAmount);
+        }
+
+        // Subtract weekly expenses from weekly income
         for (Expense expense : expenses) {
             Date expenseDate = expense.getDate();
             BigDecimal amount = expense.getAmount();
 
-            Date weekStartDate = getWeekStartDate(expenseDate);
-            BigDecimal currentAmount = weeklyExpensesMap.getOrDefault(weekStartDate, BigDecimal.ZERO);
-            BigDecimal updatedAmount = currentAmount.add(amount);
-            weeklyExpensesMap.put(weekStartDate, updatedAmount);
+            Date week = getWeek(expenseDate);
+            BigDecimal currentAmount = weeklyIncomeMap.getOrDefault(week, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.subtract(amount);
+            weeklyIncomeMap.put(week, updatedAmount);
         }
 
-        // Convert the weekly expenses map into a map with formatted date range as key and expenses as value
-        Map<String, BigDecimal> weeklyExpenses = new HashMap<>();
-        for (Map.Entry<Date, BigDecimal> entry : weeklyExpensesMap.entrySet()) {
-            Date weekStartDate = entry.getKey();
+        // Convert the weekly income map into a list of Income objects
+        List<Income> weeklyIncome = new ArrayList<>();
+        for (Map.Entry<Date, BigDecimal> entry : weeklyIncomeMap.entrySet()) {
+            Date week = entry.getKey();
             BigDecimal amount = entry.getValue();
-
-            Date weekEndDate = getWeekEndDate(weekStartDate);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String expenseRange = dateFormat.format(weekStartDate) + " - " + dateFormat.format(weekEndDate);
-            weeklyExpenses.put(expenseRange, amount);
+            Income weeklyIncomeEntry = new Income(week, amount);
+            weeklyIncome.add(weeklyIncomeEntry);
         }
 
-        return weeklyExpenses;
+        return weeklyIncome;
     }
-
-    private Date getWeekStartDate(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
-    }
-
-    private Date getWeekEndDate(Date weekStartDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(weekStartDate);
-        calendar.add(Calendar.DATE, 6); // Add 6 days to get the week end date (assuming a 7-day week)
-        return calendar.getTime();
-    }
-
-
 
 
     @GetMapping(path = "/monthlyexpenses", produces = "application/json")
@@ -229,68 +286,180 @@ public class ReportController {
             Date expenseDate = expense.getDate();
             BigDecimal amount = expense.getAmount();
 
-            Date monthStartDate = getMonthStartDate(expenseDate);
-            BigDecimal currentAmount = monthlyExpensesMap.getOrDefault(monthStartDate, BigDecimal.ZERO);
+            Date month = getMonth(expenseDate);
+            BigDecimal currentAmount = monthlyExpensesMap.getOrDefault(month, BigDecimal.ZERO);
             BigDecimal updatedAmount = currentAmount.add(amount);
-            monthlyExpensesMap.put(monthStartDate, updatedAmount);
+            monthlyExpensesMap.put(month, updatedAmount);
         }
 
-        // Convert the monthly expenses map into a list of MonthlyExpense objects
+        // Convert the monthly expenses map into a list of Expense objects
         List<Expense> monthlyExpenses = new ArrayList<>();
         for (Map.Entry<Date, BigDecimal> entry : monthlyExpensesMap.entrySet()) {
-            Date monthStartDate = entry.getKey();
+            Date month = entry.getKey();
             BigDecimal amount = entry.getValue();
-            Expense monthlyExpense = new Expense(monthStartDate, amount);
+            Expense monthlyExpense = new Expense(month, amount);
             monthlyExpenses.add(monthlyExpense);
         }
 
         return monthlyExpenses;
     }
 
-    private Date getMonthStartDate(Date date) {
+    private Date getMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+
+        // Create a new Calendar instance and set it to the start of the month
+        Calendar startOfMonth = Calendar.getInstance();
+        startOfMonth.clear();
+        startOfMonth.set(Calendar.YEAR, year);
+        startOfMonth.set(Calendar.MONTH, month);
+        startOfMonth.set(Calendar.DAY_OF_MONTH, 1);
+        startOfMonth.set(Calendar.HOUR_OF_DAY, 0);
+        startOfMonth.set(Calendar.MINUTE, 0);
+        startOfMonth.set(Calendar.SECOND, 0);
+        startOfMonth.set(Calendar.MILLISECOND, 0);
+
+        return startOfMonth.getTime();
+    }
+
+    @GetMapping(path = "/monthlyincome", produces = "application/json")
+    public List<Income> getMonthlyIncome() {
+        List<Income> incomes = this.incomedao.income();
+        List<Expense> expenses = this.expensedao.expense();
+
+        Map<Date, BigDecimal> monthlyIncomeMap = new HashMap<>();
+
+        // Calculate monthly income by summing up individual incomes
+        for (Income income : incomes) {
+            Date incomeDate = income.getDate();
+            BigDecimal amount = income.getAmount();
+
+            Date month = getMonth(incomeDate);
+            BigDecimal currentAmount = monthlyIncomeMap.getOrDefault(month, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.add(amount);
+            monthlyIncomeMap.put(month, updatedAmount);
+        }
+
+        // Subtract monthly expenses from monthly income
+        for (Expense expense : expenses) {
+            Date expenseDate = expense.getDate();
+            BigDecimal amount = expense.getAmount();
+
+            Date month = getMonth(expenseDate);
+            BigDecimal currentAmount = monthlyIncomeMap.getOrDefault(month, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.subtract(amount);
+            monthlyIncomeMap.put(month, updatedAmount);
+        }
+
+        // Convert the monthly income map into a list of Income objects
+        List<Income> monthlyIncome = new ArrayList<>();
+        for (Map.Entry<Date, BigDecimal> entry : monthlyIncomeMap.entrySet()) {
+            Date month = entry.getKey();
+            BigDecimal amount = entry.getValue();
+            Income monthlyIncomeEntry = new Income(month, amount);
+            monthlyIncome.add(monthlyIncomeEntry);
+        }
+
+        return monthlyIncome;
     }
 
     @GetMapping(path = "/yearlyexpenses", produces = "application/json")
-    public Map<Integer, BigDecimal> getYearlyExpenses() {
+    public List<Expense> getYearlyExpenses() {
         List<Expense> expenses = this.expensedao.expense();
-        Map<Integer, BigDecimal> yearlyExpensesMap = new HashMap<>();
+        Map<Date, BigDecimal> yearlyExpensesMap = new HashMap<>();
 
         // Calculate yearly expenses by summing up individual expenses
         for (Expense expense : expenses) {
             Date expenseDate = expense.getDate();
             BigDecimal amount = expense.getAmount();
 
-            int year = getYear(expenseDate);
+            Date year = getYear(expenseDate);
             BigDecimal currentAmount = yearlyExpensesMap.getOrDefault(year, BigDecimal.ZERO);
             BigDecimal updatedAmount = currentAmount.add(amount);
             yearlyExpensesMap.put(year, updatedAmount);
         }
 
-        return yearlyExpensesMap;
+        // Convert the yearly expenses map into a list of Expense objects
+        List<Expense> yearlyExpenses = new ArrayList<>();
+        for (Map.Entry<Date, BigDecimal> entry : yearlyExpensesMap.entrySet()) {
+            Date year = entry.getKey();
+            BigDecimal amount = entry.getValue();
+            Expense yearlyExpense = new Expense(year, amount);
+            yearlyExpenses.add(yearlyExpense);
+        }
+
+        return yearlyExpenses;
     }
 
-    private int getYear(Date date) {
+    @GetMapping(path = "/yearlyincome", produces = "application/json")
+    public List<Income> getYearlyIncome() {
+        List<Income> incomes = this.incomedao.income();
+        List<Expense> expenses = this.expensedao.expense();
+
+        Map<Date, BigDecimal> yearlyIncomeMap = new HashMap<>();
+
+        // Calculate yearly income by summing up individual incomes
+        for (Income income : incomes) {
+            Date incomeDate = income.getDate();
+            BigDecimal amount = income.getAmount();
+
+            Date year = getYear(incomeDate);
+            BigDecimal currentAmount = yearlyIncomeMap.getOrDefault(year, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.add(amount);
+            yearlyIncomeMap.put(year, updatedAmount);
+        }
+
+        // Subtract yearly expenses from yearly income
+        for (Expense expense : expenses) {
+            Date expenseDate = expense.getDate();
+            BigDecimal amount = expense.getAmount();
+
+            Date year = getYear(expenseDate);
+            BigDecimal currentAmount = yearlyIncomeMap.getOrDefault(year, BigDecimal.ZERO);
+            BigDecimal updatedAmount = currentAmount.subtract(amount);
+            yearlyIncomeMap.put(year, updatedAmount);
+        }
+
+        // Convert the yearly income map into a list of Income objects
+        List<Income> yearlyIncome = new ArrayList<>();
+        for (Map.Entry<Date, BigDecimal> entry : yearlyIncomeMap.entrySet()) {
+            Date year = entry.getKey();
+            BigDecimal amount = entry.getValue();
+            Income yearlyIncomeEntry = new Income(year, amount);
+            yearlyIncome.add(yearlyIncomeEntry);
+        }
+
+        return yearlyIncome;
+    }
+
+    private Date getYear(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        return calendar.get(Calendar.YEAR);
+
+        int year = calendar.get(Calendar.YEAR);
+
+        // Create a new Calendar instance and set it to the start of the year
+        Calendar endOfYear = Calendar.getInstance();
+        endOfYear.clear();
+        endOfYear.set(Calendar.YEAR, year);
+        endOfYear.set(Calendar.MONTH, Calendar.DECEMBER);
+        endOfYear.set(Calendar.DAY_OF_MONTH, 31);
+        endOfYear.set(Calendar.HOUR_OF_DAY, 23);
+        endOfYear.set(Calendar.MINUTE, 59);
+        endOfYear.set(Calendar.SECOND, 59);
+        endOfYear.set(Calendar.MILLISECOND, 999);
+
+        return endOfYear.getTime();
     }
 
-
-
-
-
-
-
-
 }
+
+
+
+
 
 
 

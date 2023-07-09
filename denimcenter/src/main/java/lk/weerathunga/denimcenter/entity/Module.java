@@ -15,6 +15,7 @@ public class Module {
     @Basic
     @Column(name = "name")
     private String name;
+
     @JsonIgnore
     @OneToMany(mappedBy = "module")
     private Collection<Privilege> privileges;

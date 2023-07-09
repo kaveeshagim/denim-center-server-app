@@ -21,16 +21,22 @@ public class GenderController {
 
     @GetMapping(path = "/list", produces = "application/json")
     public List<Gender> get() {
-
+        // Retrieve all Gender objects from the database using the genderDao
         List<Gender> genders = this.genderDao.findAll();
 
-        genders = genders.stream().map(
-                gender -> { Gender d = new Gender();
-                    d.setId(gender.getId());
-                    d.setName(gender.getName());
-                    return d; }
-        ).collect(Collectors.toList());
+        // Perform a mapping operation on each Gender object
+        genders = genders.stream().map(gender -> {
+            // Create a new Gender object
+            Gender d = new Gender();
+            // Set the id and name of the new Gender object to the corresponding values from the retrieved object
+            d.setId(gender.getId());
+            d.setName(gender.getName());
+            // Return the new Gender object
+            return d;
+        }).collect(Collectors.toList());
 
+        // Return the list of modified Gender objects
         return genders;
     }
+
 }

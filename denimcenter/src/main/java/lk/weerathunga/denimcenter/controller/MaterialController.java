@@ -86,16 +86,10 @@ public class MaterialController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Material mat1 = materialdao.findByName(material.getName());
+        Material mat = materialdao.findByName(material.getName());
 
-        //System.out.println("ID-"+material.getId()+"-"+material.getNic());
-        //if(emp1!=null) System.out.println("NIC-"+emp1.getNic());
-
-        if(mat1!=null && material.getId()!=mat1.getId())
+        if(mat!=null && material.getId()!=mat.getId())
             errors = errors+"<br> Existing Name";
-
-        //System.out.println(material.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") materialdao.save(material);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -113,10 +107,10 @@ public class MaterialController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Material emp1 = materialdao.findAllById(id);
-        if(emp1==null)
+        Material mat = materialdao.findAllById(id);
+        if(mat==null)
             errors = errors+"<br> material Does Not Existed";
-        if(errors=="") materialdao.delete(emp1);
+        if(errors=="") materialdao.delete(mat);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/materials/"+id);

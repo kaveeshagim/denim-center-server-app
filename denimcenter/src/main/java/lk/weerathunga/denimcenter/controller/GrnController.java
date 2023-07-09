@@ -89,14 +89,8 @@ public class GrnController {
 
         Grn prod1 = grndao.findByNumber(grn.getNumber());
 
-        //System.out.println("ID-"+grn.getId()+"-"+grn.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
         if(prod1!=null && grn.getId()!=prod1.getId())
             errors = errors+"<br> Existing Number";
-
-        //System.out.println(grn.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") grndao.save(grn);
         else errors = "Server Validation Errors : <br> "+errors;

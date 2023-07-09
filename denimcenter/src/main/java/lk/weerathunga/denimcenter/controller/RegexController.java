@@ -19,7 +19,6 @@ public class RegexController {
 
     @GetMapping(path = "/product", produces = "application/json")
     public HashMap<String, HashMap<String, String>> product() { return RegexProvider.get(new Product());}
-
     @GetMapping(path = "/material", produces = "application/json")
     public HashMap<String, HashMap<String, String>> material() { return RegexProvider.get(new Material());}
 
@@ -28,7 +27,6 @@ public class RegexController {
 
     @GetMapping(path = "/grn", produces = "application/json")
     public HashMap<String, HashMap<String, String>> grn() { return RegexProvider.get(new Grn());}
-
     @GetMapping(path = "/invoice", produces = "application/json")
     public HashMap<String, HashMap<String, String>> invoice() { return RegexProvider.get(new Invoice());}
     @GetMapping(path = "/productionorder", produces = "application/json")
@@ -55,7 +53,6 @@ public class RegexController {
     public HashMap<String, HashMap<String, String>> materialinventory() { return RegexProvider.get(new Materialinventory());}
     @GetMapping(path = "/productinventory", produces = "application/json")
     public HashMap<String, HashMap<String, String>> productinventory() { return RegexProvider.get(new Productinventory());}
-
     @GetMapping(path = "/billofmaterial", produces = "application/json")
     public HashMap<String, HashMap<String, String>> billofmaterial() { return RegexProvider.get(new Billofmaterial());}
 }

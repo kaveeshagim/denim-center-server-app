@@ -48,9 +48,6 @@ public class MaterialmovementController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(materialmovementdao.findByCode(materialmovement.getCode())!=null)
-            errors = errors+"<br> Existing Code";*/
-
         if(errors=="")
             materialmovementdao.save(materialmovement);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -69,17 +66,6 @@ public class MaterialmovementController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        //Materialmovement prod1 = materialmovementdao.findByCode(materialmovement.getCode());
-
-        //System.out.println("ID-"+materialmovement.getId()+"-"+materialmovement.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        /*if(prod1!=null && materialmovement.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";*/
-
-        //System.out.println(materialmovement.getFirstname());
-        //System.out.println("Err-"+errors);
-
         if(errors=="") materialmovementdao.save(materialmovement);
         else errors = "Server Validation Errors : <br> "+errors;
 
@@ -96,10 +82,10 @@ public class MaterialmovementController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Materialmovement emp1 = materialmovementdao.findAllById(id);
-        if(emp1==null)
+        Materialmovement mat = materialmovementdao.findAllById(id);
+        if(mat==null)
             errors = errors+"<br> materialmovement Does Not Existed";
-        if(errors=="") materialmovementdao.delete(emp1);
+        if(errors=="") materialmovementdao.delete(mat);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/materialmovements/"+id);

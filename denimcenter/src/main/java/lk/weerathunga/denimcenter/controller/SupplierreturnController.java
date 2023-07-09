@@ -47,9 +47,6 @@ public class SupplierreturnController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(supplierreturndao.findByCode(supplierreturn.getCode())!=null)
-            errors = errors+"<br> Existing Code";*/
-
         if(errors=="")
             supplierreturndao.save(supplierreturn);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -68,17 +65,6 @@ public class SupplierreturnController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        //Supplierreturn prod1 = supplierreturndao.findByCode(supplierreturn.getCode());
-
-        //System.out.println("ID-"+supplierreturn.getId()+"-"+supplierreturn.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        /*if(prod1!=null && supplierreturn.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";*/
-
-        //System.out.println(supplierreturn.getFirstname());
-        //System.out.println("Err-"+errors);
-
         if(errors=="") supplierreturndao.save(supplierreturn);
         else errors = "Server Validation Errors : <br> "+errors;
 
@@ -95,10 +81,10 @@ public class SupplierreturnController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Supplierreturn emp1 = supplierreturndao.findAllById(id);
-        if(emp1==null)
+        Supplierreturn ret = supplierreturndao.findAllById(id);
+        if(ret==null)
             errors = errors+"<br> supplierreturn Does Not Existed";
-        if(errors=="") supplierreturndao.delete(emp1);
+        if(errors=="") supplierreturndao.delete(ret);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/supplierreturns/"+id);

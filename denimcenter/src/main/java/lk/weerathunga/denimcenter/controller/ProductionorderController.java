@@ -82,16 +82,10 @@ public class ProductionorderController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Productionorder prod1 = productionorderdao.findByNumber(productionorder.getNumber());
+        Productionorder pod = productionorderdao.findByNumber(productionorder.getNumber());
 
-        //System.out.println("ID-"+product.getId()+"-"+product.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        if(prod1!=null && productionorder.getId()!=prod1.getId())
+        if(pod!=null && productionorder.getId()!=pod.getId())
             errors = errors+"<br> Existing Number";
-
-        //System.out.println(product.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") productionorderdao.save(productionorder);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -109,10 +103,10 @@ public class ProductionorderController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Productionorder emp1 = productionorderdao.findAllById(id);
-        if(emp1==null)
+        Productionorder pod = productionorderdao.findAllById(id);
+        if(pod==null)
             errors = errors+"<br> productionorder Does Not Existed";
-        if(errors=="") productionorderdao.delete(emp1);
+        if(errors=="") productionorderdao.delete(pod);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/productionorders/"+id);

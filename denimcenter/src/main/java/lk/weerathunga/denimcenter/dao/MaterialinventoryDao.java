@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MaterialinventoryDao extends JpaRepository<Materialinventory, Integer> {
 
     Materialinventory findByNumber(String number);
-
     Materialinventory findAllById(Integer id);
 }

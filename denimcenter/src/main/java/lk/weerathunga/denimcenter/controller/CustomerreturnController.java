@@ -48,12 +48,8 @@ public class CustomerreturnController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(customerreturndao.findByCode(customerreturn.getCode())!=null)
-            errors = errors+"<br> Existing Code";
-
-        if(errors=="")
-            customerreturndao.save(customerreturn);
-        else errors = "Server Validation Errors : <br> "+errors;*/
+        if(errors=="") customerreturndao.save(customerreturn);
+        else errors = "Server Validation Errors : <br> "+errors;
 
         response.put("id", String.valueOf(customerreturn.getId()));
         response.put("url","/customerreturns/"+customerreturn.getId());
@@ -69,20 +65,6 @@ public class CustomerreturnController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*Customerreturn prod1 = customerreturndao.findByCode(customerreturn.getCode());
-
-        //System.out.println("ID-"+customerreturn.getId()+"-"+customerreturn.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        if(prod1!=null && customerreturn.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";
-
-        //System.out.println(customerreturn.getFirstname());
-        //System.out.println("Err-"+errors);
-
-        if(errors=="") customerreturndao.save(customerreturn);
-        else errors = "Server Validation Errors : <br> "+errors;*/
-
         response.put("id", String.valueOf(customerreturn.getId()));
         response.put("url","/customerreturns/"+customerreturn.getId());
         response.put("errors",errors);
@@ -96,10 +78,10 @@ public class CustomerreturnController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Customerreturn emp1 = customerreturndao.findAllById(id);
-        if(emp1==null)
+        Customerreturn ret = customerreturndao.findAllById(id);
+        if(ret==null)
             errors = errors+"<br> customer Does Not Existed";
-        if(errors=="") customerreturndao.delete(emp1);
+        if(errors=="") customerreturndao.delete(ret);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/customerreturns/"+id);

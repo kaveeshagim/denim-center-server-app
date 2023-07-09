@@ -1,12 +1,10 @@
 package lk.weerathunga.denimcenter.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lk.weerathunga.denimcenter.util.RegexPattern;
-
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Collection;
+import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -15,24 +13,28 @@ public class User {
     @Column(name = "id")
     private Integer id;
     @Basic
+    @Size(min = 4)
     @Column(name = "username")
     private String username;
     @Basic
+    @Size(min = 4)
     @Column(name = "password")
     private String password;
-    @Basic
-    @Column(name = "docreated")
-    @RegexPattern(reg = "^\\d{2}-\\d{2}-\\d{2}$", msg = "Invalid Date Format")
-    private Timestamp docreated;
-    @Basic
-    @Column(name = "description")
-    private String description;
-    @ManyToOne
-    @JoinColumn(name = "userstatus_id", referencedColumnName = "id", nullable = false)
-    private Userstatus userstatus;
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private Collection<Userrole> userroles;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(  name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
 
     public Integer getId() {
         return id;
@@ -50,28 +52,18 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() {return password;}
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public Timestamp getDocreated() {
-        return docreated;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setDocreated(Timestamp docreated) {
-        this.docreated = docreated;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -79,27 +71,11 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(docreated, user.docreated) && Objects.equals(description, user.description);
+        return Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(password, user.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, password, docreated, description);
-    }
-
-    public Userstatus getUserstatus() {
-        return userstatus;
-    }
-
-    public void setUserstatus(Userstatus userstatus) {
-        this.userstatus = userstatus;
-    }
-
-    public Collection<Userrole> getUserroles() {
-        return userroles;
-    }
-
-    public void setUserroles(Collection<Userrole> userroles) {
-        this.userroles = userroles;
+        return Objects.hash(id, username, password);
     }
 }

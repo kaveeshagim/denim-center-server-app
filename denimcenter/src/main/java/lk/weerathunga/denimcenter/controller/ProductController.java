@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
@@ -37,8 +37,10 @@ public class ProductController {
         // Filtering the products based on the given parameters
         if(params.isEmpty()) return products;
 
+        /*Stream API to filter a collection of products based on certain criteria and return the filtered products as a list*/
         Stream<Product> estream = products.stream();
 
+        //series of filtering operations on the stream based on different conditions
         if(code!=null) estream = estream.filter(e -> e.getCode().equals(code));
         if(name!=null) estream = estream.filter(e -> e.getName().contains(name));
         if(genderid!=null) estream = estream.filter(e -> e.getGender().getId()==Integer.parseInt(genderid));
@@ -47,6 +49,9 @@ public class ProductController {
         if(sizeid!=null) estream = estream.filter(e -> e.getSize().getId()==Integer.parseInt(sizeid));
         if(typeid!=null) estream = estream.filter(e -> e.getType().getId()==Integer.parseInt(typeid));
 
+        /*Finally, the filtered elements remaining in the stream are collected into a list using the collect method.
+        The Collectors.toList() method is used to collect the stream elements into a new List object,
+        which is then returned from the method.*/
         return estream.collect(Collectors.toList());
     }
 
@@ -62,6 +67,7 @@ public class ProductController {
                     s.setId(product.getId());
                     s.setCode(product.getCode());
                     s.setPrice(product.getPrice());
+                    s.setName(product.getName());
                     return s; }
         ).collect(Collectors.toList());
 
@@ -99,10 +105,10 @@ public class ProductController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Product prod1 = productdao.findByCode(product.getCode());
+        Product prod = productdao.findByCode(product.getCode());
 
         // Validating the product code
-        if(prod1!=null && product.getId()!=prod1.getId())
+        if(prod!=null && product.getId()!=prod.getId())
             errors = errors+"<br> Existing Code";
 
         if(errors=="") productdao.save(product);
@@ -122,10 +128,10 @@ public class ProductController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Product prod1 = productdao.findAllById(id);
-        if(prod1==null)
+        Product prod = productdao.findAllById(id);
+        if(prod==null)
             errors = errors+"<br> product Does Not Existed";
-        if(errors=="") productdao.delete(prod1);
+        if(errors=="") productdao.delete(prod);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/products/"+id);

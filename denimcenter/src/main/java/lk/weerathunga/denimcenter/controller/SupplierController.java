@@ -90,16 +90,10 @@ public class SupplierController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Supplier sup1 = supplierdao.findByNic(supplier.getNic());
+        Supplier sup = supplierdao.findByNic(supplier.getNic());
 
-        //System.out.println("ID-"+supplier.getId()+"-"+supplier.getNic());
-        //if(emp1!=null) System.out.println("NIC-"+emp1.getNic());
-
-        if(sup1!=null && supplier.getId()!=sup1.getId())
+        if(sup!=null && supplier.getId()!=sup.getId())
             errors = errors+"<br> Existing NIC";
-
-        //System.out.println(supplier.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") supplierdao.save(supplier);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -117,10 +111,10 @@ public class SupplierController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Supplier emp1 = supplierdao.findAllById(id);
-        if(emp1==null)
+        Supplier sup = supplierdao.findAllById(id);
+        if(sup==null)
             errors = errors+"<br> supplier Does Not Existed";
-        if(errors=="") supplierdao.delete(emp1);
+        if(errors=="") supplierdao.delete(sup);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/suppliers/"+id);

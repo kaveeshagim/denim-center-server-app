@@ -86,16 +86,10 @@ public class CorderController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Corder emp1 = corderdao.findByNumber(corder.getNumber());
+        Corder cod = corderdao.findByNumber(corder.getNumber());
 
-        //System.out.println("ID-"+corder.getId()+"-"+corder.getNic());
-        //if(emp1!=null) System.out.println("NIC-"+emp1.getNic());
-
-        if(emp1!=null && corder.getId()!=emp1.getId())
+        if(cod!=null && corder.getId()!=cod.getId())
             errors = errors+"<br> Existing Number";
-
-        //System.out.println(corder.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") corderdao.save(corder);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -113,10 +107,10 @@ public class CorderController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Corder emp1 = corderdao.findAllById(id);
-        if(emp1==null)
+        Corder cod = corderdao.findAllById(id);
+        if(cod==null)
             errors = errors+"<br> corder Does Not Existed";
-        if(errors=="") corderdao.delete(emp1);
+        if(errors=="") corderdao.delete(cod);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/corders/"+id);

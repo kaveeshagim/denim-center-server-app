@@ -1,9 +1,6 @@
 package lk.weerathunga.denimcenter.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -14,13 +11,8 @@ public class Role {
     private Integer id;
     @Basic
     @Column(name = "name")
-    private String name;
-    @JsonIgnore
-    @OneToMany(mappedBy = "role")
-    private Collection<Privilege> privileges;
-    @JsonIgnore
-    @OneToMany(mappedBy = "role")
-    private Collection<Userrole> userroles;
+    @Enumerated(EnumType.STRING)
+    private ERole name;
 
     public Integer getId() {
         return id;
@@ -30,11 +22,11 @@ public class Role {
         this.id = id;
     }
 
-    public String getName() {
+    public ERole getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(ERole name) {
         this.name = name;
     }
 
@@ -49,21 +41,5 @@ public class Role {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
-    }
-
-    public Collection<Privilege> getPrivileges() {
-        return privileges;
-    }
-
-    public void setPrivileges(Collection<Privilege> privileges) {
-        this.privileges = privileges;
-    }
-
-    public Collection<Userrole> getUserroles() {
-        return userroles;
-    }
-
-    public void setUserroles(Collection<Userrole> userroles) {
-        this.userroles = userroles;
     }
 }

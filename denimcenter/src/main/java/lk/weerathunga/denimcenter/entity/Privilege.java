@@ -15,6 +15,7 @@ public class Privilege {
     @ManyToOne
     @JoinColumn(name = "module_id", referencedColumnName = "id", nullable = false)
     private Module module;
+
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;

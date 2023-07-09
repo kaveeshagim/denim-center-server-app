@@ -48,12 +48,9 @@ public class CustomerpaymentController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        /*if(customerpaymentdao.findByCode(customerpayment.getCode())!=null)
-            errors = errors+"<br> Existing Code";
-
         if(errors=="")
             customerpaymentdao.save(customerpayment);
-        else errors = "Server Validation Errors : <br> "+errors;*/
+        else errors = "Server Validation Errors : <br> "+errors;
 
         response.put("id", String.valueOf(customerpayment.getId()));
         response.put("url","/customerpayments/"+customerpayment.getId());
@@ -68,17 +65,6 @@ public class CustomerpaymentController {
 
         HashMap<String, String> response = new HashMap<>();
         String errors="";
-
-        //Customerpayment prod1 = customerpaymentdao.findByCode(customerpayment.getCode());
-
-        //System.out.println("ID-"+customerpayment.getId()+"-"+customerpayment.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        /*if(prod1!=null && customerpayment.getId()!=prod1.getId())
-            errors = errors+"<br> Existing Code";*/
-
-        //System.out.println(customerpayment.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") customerpaymentdao.save(customerpayment);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -96,10 +82,10 @@ public class CustomerpaymentController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Customerpayment emp1 = customerpaymentdao.findAllById(id);
-        if(emp1==null)
+        Customerpayment pay = customerpaymentdao.findAllById(id);
+        if(pay==null)
             errors = errors+"<br> customerpayment Does Not Existed";
-        if(errors=="") customerpaymentdao.delete(emp1);
+        if(errors=="") customerpaymentdao.delete(pay);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/customerpayments/"+id);

@@ -87,16 +87,10 @@ public class MaterialinventoryController {
         HashMap<String, String> response = new HashMap<>();
         String errors="";
 
-        Materialinventory prod1 = materialinventorydao.findByNumber(materialinventory.getNumber());
+        Materialinventory mat = materialinventorydao.findByNumber(materialinventory.getNumber());
 
-        //System.out.println("ID-"+materialinventory.getId()+"-"+materialinventory.getNic());
-        //if(prod1!=null) System.out.println("NIC-"+prod1.getNic());
-
-        if(prod1!=null && materialinventory.getId()!=prod1.getId())
+        if(mat!=null && materialinventory.getId()!=mat.getId())
             errors = errors+"<br> Existing Number";
-
-        //System.out.println(materialinventory.getFirstname());
-        //System.out.println("Err-"+errors);
 
         if(errors=="") materialinventorydao.save(materialinventory);
         else errors = "Server Validation Errors : <br> "+errors;
@@ -114,10 +108,10 @@ public class MaterialinventoryController {
         System.out.println(id);
         HashMap<String,String> response = new HashMap<>();
         String errors="";
-        Materialinventory emp1 = materialinventorydao.findAllById(id);
-        if(emp1==null)
+        Materialinventory mat = materialinventorydao.findAllById(id);
+        if(mat==null)
             errors = errors+"<br> materialinventory Does Not Existed";
-        if(errors=="") materialinventorydao.delete(emp1);
+        if(errors=="") materialinventorydao.delete(mat);
         else errors = "Server Validation Errors : <br> "+errors;
         response.put("id",String.valueOf(id));
         response.put("url","/materialinventorys/"+id);
